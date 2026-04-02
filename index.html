@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>La Chasse aux Trésors Magique</title>
+    <style>
+        :root { --rose: #ff69b4; --vert: #4caf50; --bleu: #87ceeb; }
+        
+        body { 
+            font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif; 
+            background: #fff5f8; 
+            margin: 0; 
+            overflow: hidden; 
+            text-align: center; 
+            user-select: none;
+        }
+
+        /* Barre d'instructions */
+        #header { 
+            background: var(--rose); 
+            color: white; 
+            padding: 15px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative; 
+            z-index: 10;
+        }
+
+        /* Zone de la carte */
+        .map-container { 
+            position: relative; 
+            width: 100vw; 
+            height: calc(100vh - 60px); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background: #f0f0f0;
+        }
+        
+        .map-img { 
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain; 
+        }
+
+        /* Style des points (Spots) */
+        .spot {
+            position: absolute; 
+            width: 70px; 
+            height: 70px; 
+            background: white;
+            border: 4px solid var(--rose); 
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 35px; 
+            transform: translate(-50%, -50%); 
+            z-index: 5;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .pulse { animation: pulse-effect 2s infinite; }
+        @keyframes pulse-effect {
+            0% { transform: translate(-50%, -50%) scale(0.9); box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
+            70% { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 0 0 20px rgba(255, 105, 180, 0); }
+            100% { transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        .found { background: #d1ffd1; border-color: var(--vert); opacity: 0.6; animation: none; }
+        .hidden { display: none; }
+
+        /* Fenêtre Indice (Popup Photo) */
+        #overlay {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); 
+            z-index: 100; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            color: white;
+        }
+        
+        #hint-photo { 
+            width: 85%; 
+            border: 8px solid white; 
+            border-radius: 20px; 
+            max-height: 60vh; 
+            object-fit: cover; 
+            margin: 20px 0;
+        }
+
+        .btn-confirm { 
+            background: var(--vert); 
+            color: white; 
+            border: none; 
+            padding: 20px 40px; 
+            border-radius: 50px; 
+            font-size: 1.4rem; 
+            font-weight: bold; 
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Écran final de Victoire */
+        #victory-screen {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: white; 
+            z-index: 200; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="header">🏠 Appuie sur la Maison pour commencer !</div>
+
+<div class="map-container">
+    <img src="carte.jpg" class="map-img" alt="Carte">
+
+    <div id="step0" class="spot pulse" style="top: 60%; left: 63%;" onclick="openHint(0, '🐣 Trouve les petits œufs sur le chemin !')">🏠</div>
+    
+    <div id="step1" class="spot hidden" style="top: 45%; left: 40%;" onclick="openHint(1, '🌸 Super ! Cherche l\'œuf moyen suivant !')">🥚</div>
+    
+    <div id="step2" class="spot hidden" style="top: 58%; left: 32%;" onclick="openHint(2, '🐰 On approche... Trouve le LAPIN caché !')">🥚</div>
+    
+    <div id="step3" class="spot hidden" style="top: 28%; left: 75%;" onclick="openHint(3, '🏆 INCROYABLE ! Vite, cherche le GROS TRÉSOR !')">🐰</div>
+    
+    <div id="step4" class="spot hidden" style="top: 18%; left: 42%;" onclick="openHint(4, 'FINI !')">🎁</div>
+</div>
+
+<div id="overlay">
+    <h2 id="hint-title">Cherche ici :</h2>
+    <img id="hint-photo" src="">
+    <button class="btn-confirm" onclick="confirmDiscovery()">J'ai trouvé ! ✅</button>
+</div>
+
+<div id="victory-screen">
+    <h1 style="color: var(--rose); font-size: 3rem; margin-bottom: 10px;">BRAVO ! 🎉</h1>
+    <p style="font-size: 1.5rem;">Tu as fini la chasse aux trésors !</p>
+    <div style="font-size: 100px; margin: 20px;">🐰🍫🐣</div>
+    <button onclick="location.reload()" style="padding: 15px 30px; border-radius: 30px; border: none; background: var(--rose); color: white; font-size: 1.2rem; cursor: pointer;">Recommencer</button>
+</div>
+
+<script>
+    let currentStep = 0;
+    let nextMsgStore = "";
+
+    function openHint(step, message) {
+        currentStep = step;
+        nextMsgStore = message;
+        // On charge la photo dynamique (photo0.jpg, photo1.jpg, etc.)
+        document.getElementById('hint-photo').src = 'photo' + step + '.jpg';
+        document.getElementById('overlay').style.display = 'flex';
+    }
+
+    function confirmDiscovery() {
+        document.getElementById('overlay').style.display = 'none';
+        
+        // On valide le point actuel
+        const spot = document.getElementById('step' + currentStep);
+        spot.classList.remove('pulse');
+        spot.classList.add('found');
+        spot.onclick = null; // Empêche de recliquer
+
+        if (currentStep === 4) {
+            // Fin du jeu
+            document.getElementById('victory-screen').style.display = 'flex';
+        } else {
+            // Afficher l'étape suivante
+            document.getElementById('header').innerText = nextMsgStore;
+            const nextSpot = document.getElementById('step' + (currentStep + 1));
+            nextSpot.classList.remove('hidden');
+            nextSpot.classList.add('pulse');
+        }
+    }
+</script>
+
+</body>
+</html>
