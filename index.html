@@ -10,21 +10,20 @@
         
         #header { background: var(--rose); color: white; padding: 15px; font-size: 1.2rem; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         
-        /* CE BLOC EST LA CLÉ : Il force les points à suivre l'image */
+        /* Conteneur qui force les points à suivre l'image */
         .map-wrapper { 
             position: relative; 
-            display: inline-block; /* S'adapte à la largeur de l'image */
+            display: inline-block; 
             width: 100%; 
-            max-width: 1000px; /* Taille max PC */
             margin: 0 auto;
         }
 
-        .map-img { width: 100%; height: auto; display: block; border-radius: 5px; }
+        .map-img { width: 100%; height: auto; display: block; }
 
         .spot {
-            position: absolute; width: 60px; height: 60px; background: white; border: 4px solid var(--rose);
+            position: absolute; width: 65px; height: 65px; background: white; border: 4px solid var(--rose);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 30px; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            font-size: 32px; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
 
         .pulse { animation: pulse-anim 2s infinite; }
