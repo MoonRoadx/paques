@@ -3,82 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chasse Magique de Pâques</title>
+    <title>Chasse aux Œufs Magique</title>
     <style>
         :root { --rose: #ff69b4; --vert: #4caf50; }
-        body { font-family: 'Comic Sans MS', cursive; background: #fff5f8; margin: 0; overflow: hidden; text-align: center; }
-        #header { background: var(--rose); color: white; padding: 12px; font-weight: bold; position: relative; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .map-box { position: relative; width: 100vw; height: calc(100vh - 50px); display: flex; justify-content: center; align-items: center; background: #ccc; }
-        .map-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #fffafa; text-align: center; margin: 0; overflow: hidden; touch-action: manipulation; }
+        #header { background: var(--rose); color: white; padding: 15px; font-size: 1.2rem; font-weight: bold; position: relative; z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        .map-container { position: relative; width: 100vw; height: calc(100vh - 60px); display: flex; justify-content: center; align-items: center; background: #eee; }
+        .map-img { max-width: 100%; max-height: 100%; display: block; border-radius: 10px; }
 
         .spot {
-            position: absolute; width: 60px; height: 60px; background: white; border: 4px solid var(--rose);
+            position: absolute; width: 70px; height: 70px; background: white; border: 4px solid var(--rose);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 30px; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-size: 35px; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
 
-        .pulse { animation: pulse-effect 2s infinite; }
-        @keyframes pulse-effect {
+        .pulse { animation: pulse-anim 2s infinite; }
+        @keyframes pulse-anim {
             0% { transform: translate(-50%, -50%) scale(0.9); box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
             70% { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 0 0 15px rgba(255, 105, 180, 0); }
             100% { transform: translate(-50%, -50%) scale(0.9); }
         }
 
         .hidden { display: none; }
-        .found { background: #d1ffd1; border-color: var(--vert); opacity: 0.7; animation: none; }
+        .found { background: #bdfcc9; border-color: #2e8b57; animation: none; opacity: 0.7; }
 
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; justify-content: center; align-items: center; color: white; }
-        #hint-img { width: 85%; border: 8px solid white; border-radius: 20px; max-height: 60vh; object-fit: cover; margin: 15px 0; }
-        .btn { background: var(--vert); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 1.3rem; font-weight: bold; cursor: pointer; }
-        #win { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; flex-direction: column; justify-content: center; align-items: center; }
+        #photo-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; justify-content: center; align-items: center; }
+        #hint-img { width: 85%; border: 8px solid white; border-radius: 20px; max-height: 60vh; object-fit: cover; }
+        .btn-confirm { margin-top: 20px; padding: 15px 40px; background: var(--vert); color: white; border-radius: 30px; font-size: 1.5rem; border: none; font-weight: bold; }
+
+        #victory { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
-<div id="header">🏠 Appuie sur l'Étoile pour commencer !</div>
+<div id="header">🏠 Appuie sur l'Étoile !</div>
 
-<div class="map-box">
+<div class="map-container">
     <img src="carte.jpg" class="map-img">
 
-    <div id="s0" class="spot pulse" style="top: 71%; left: 63%;" onclick="openH(0, '🐣 Cherche le premier indice !')">⭐</div>
-    <div id="s1" class="spot hidden" style="top: 45%; left: 81%;" onclick="openH(1, '🌸 Continue la chasse !')">🥚</div>
-    <div id="s2" class="spot hidden" style="top: 5%; left: 91%;" onclick="openH(2, '🥚 Tu es sur la bonne voie !')">🥚</div>
-    <div id="s3" class="spot hidden" style="top: 43%; left: 33%;" onclick="openH(3, '🐰 Trouve le Lapin !')">🐰</div>
-    <div id="s4" class="spot hidden" style="top: 26%; left: 13%;" onclick="openH(4, '🎁 Presque fini...')">🥚</div>
-    <div id="s5" class="spot hidden" style="top: 13%; left: 6%;" onclick="openH(5, '🏆 LE TRÉSOR !')">🎁</div>
+    <div id="step0" class="spot pulse" style="top: 70%; left: 63%;" onclick="openPhoto(0, '🐣 Suis le chemin !')">⭐</div>
+    <div id="step1" class="spot hidden" style="top: 48%; left: 80%;" onclick="openPhoto(1, '🌸 Cherche l\'indice suivant !')">🥚</div>
+    <div id="step2" class="spot hidden" style="top: 10%; left: 88%;" onclick="openPhoto(2, '🥚 Tu chauffes !')">🥚</div>
+    <div id="step3" class="spot hidden" style="top: 43%; left: 33%;" onclick="openPhoto(3, '🐰 Trouve le Lapin !')">🐰</div>
+    <div id="step4" class="spot hidden" style="top: 28%; left: 15%;" onclick="openPhoto(4, '🎁 Presque au trésor !')">🥚</div>
+    <div id="step5" class="spot hidden" style="top: 15%; left: 8%;" onclick="openPhoto(5, '🏆 LE TRÉSOR !')">🎁</div>
 </div>
 
-<div id="overlay">
-    <h2 id="t">Regarde ici :</h2>
-    <img id="hint" src="">
-    <button class="btn" onclick="v()">J'ai trouvé ! ✅</button>
+<div id="photo-popup">
+    <h2 style="color: white;">Cherche ici :</h2>
+    <img id="hint-img" src="">
+    <button class="btn-confirm" onclick="closePhoto()">J'ai trouvé ! ✅</button>
 </div>
 
-<div id="win">
+<div id="victory">
     <h1 style="color: var(--rose); font-size: 3rem;">BRAVO ! 🎉</h1>
-    <div style="font-size: 80px;">🐰🍫🐣</div>
-    <button onclick="location.reload()" class="btn">Recommencer</button>
+    <div style="font-size: 100px;">🐰🍫🐣</div>
+    <button onclick="location.reload()" class="btn-confirm">Recommencer</button>
 </div>
 
 <script>
-    let step = 0; let msg = "";
-    function openH(n, m) {
-        step = n; msg = m;
-        document.getElementById('hint').src = 'photo' + n + '.jpg';
-        document.getElementById('overlay').style.display = 'flex';
+    let currentActiveStep = 0;
+    let nextMsgTemp = "";
+
+    function openPhoto(num, nextMsg) {
+        document.getElementById('hint-img').src = 'photo' + num + '.jpg';
+        document.getElementById('photo-popup').style.display = 'flex';
+        currentActiveStep = num;
+        nextMsgTemp = nextMsg;
     }
-    function v() {
-        document.getElementById('overlay').style.display = 'none';
-        let c = document.getElementById('s' + step);
-        c.classList.remove('pulse'); c.classList.add('found'); c.onclick = null;
-        if (step === 5) {
-            document.getElementById('win').style.display = 'flex';
+
+    function closePhoto() {
+        document.getElementById('photo-popup').style.display = 'none';
+        const current = document.getElementById('step' + currentActiveStep);
+        current.classList.remove('pulse');
+        current.classList.add('found');
+
+        if (currentActiveStep === 5) {
+            document.getElementById('victory').style.display = 'flex';
         } else {
-            document.getElementById('header').innerText = msg;
-            let n = document.getElementById('s' + (step + 1));
-            n.classList.remove('hidden'); n.classList.add('pulse');
+            document.getElementById('header').innerText = nextMsgTemp;
+            const next = document.getElementById('step' + (currentActiveStep + 1));
+            next.classList.remove('hidden');
+            next.classList.add('pulse');
         }
     }
 </script>
+
 </body>
 </html>
