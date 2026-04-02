@@ -6,16 +6,25 @@
     <title>Chasse aux Œufs Magique</title>
     <style>
         :root { --rose: #ff69b4; --vert: #4caf50; }
-        body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #fffafa; text-align: center; margin: 0; overflow: hidden; touch-action: manipulation; }
-        #header { background: var(--rose); color: white; padding: 15px; font-size: 1.2rem; font-weight: bold; position: relative; z-index: 10; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #fffafa; text-align: center; margin: 0; padding: 0; }
         
-        .map-container { position: relative; width: 100vw; height: calc(100vh - 60px); display: flex; justify-content: center; align-items: center; background: #eee; }
-        .map-img { max-width: 100%; max-height: 100%; display: block; border-radius: 10px; }
+        #header { background: var(--rose); color: white; padding: 15px; font-size: 1.2rem; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        /* CE BLOC EST LA CLÉ : Il force les points à suivre l'image */
+        .map-wrapper { 
+            position: relative; 
+            display: inline-block; /* S'adapte à la largeur de l'image */
+            width: 100%; 
+            max-width: 1000px; /* Taille max PC */
+            margin: 0 auto;
+        }
+
+        .map-img { width: 100%; height: auto; display: block; border-radius: 5px; }
 
         .spot {
-            position: absolute; width: 70px; height: 70px; background: white; border: 4px solid var(--rose);
+            position: absolute; width: 60px; height: 60px; background: white; border: 4px solid var(--rose);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 35px; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            font-size: 30px; transform: translate(-50%, -50%); z-index: 5; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
 
         .pulse { animation: pulse-anim 2s infinite; }
@@ -28,30 +37,25 @@
         .hidden { display: none; }
         .found { background: #bdfcc9; border-color: #2e8b57; animation: none; opacity: 0.7; }
 
-        #photo-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; justify-content: center; align-items: center; }
+        #photo-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; }
         #hint-img { width: 85%; border: 8px solid white; border-radius: 20px; max-height: 60vh; object-fit: cover; }
         .btn-confirm { margin-top: 20px; padding: 15px 40px; background: var(--vert); color: white; border-radius: 30px; font-size: 1.5rem; border: none; font-weight: bold; }
 
-        #victory { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; flex-direction: column; justify-content: center; align-items: center; }
+        #victory { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 
 <div id="header">🏠 Appuie sur l'Étoile !</div>
 
-<div class="map-container">
+<div class="map-wrapper">
     <img src="carte.jpg" class="map-img">
 
     <div id="step0" class="spot pulse" style="top: 45%; left: 45%;" onclick="openPhoto(0, '🐣 Cherche le premier indice !')">⭐</div>
-    
     <div id="step1" class="spot hidden" style="top: 33%; left: 38%;" onclick="openPhoto(1, '🌸 Continue vers l\'indice suivant !')">🥚</div>
-    
     <div id="step2" class="spot hidden" style="top: 18%; left: 38%;" onclick="openPhoto(2, '🥚 Tu chauffes !')">🥚</div>
-    
     <div id="step3" class="spot hidden" style="top: 13%; left: 48%;" onclick="openPhoto(3, '🐰 Trouve le LAPIN caché !')">🐰</div>
-    
     <div id="step4" class="spot hidden" style="top: 13%; left: 65%;" onclick="openPhoto(4, '🎁 Presque fini...')">🥚</div>
-    
     <div id="step5" class="spot hidden" style="top: 44%; left: 58%;" onclick="openPhoto(5, '🏆 LE TRÉSOR !')">🎁</div>
 </div>
 
