@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chasse aux Œufs Magique</title>
+    <title>Chasse aux Œufs de Lanha</title>
     <style>
         :root { --rose: #ff69b4; --vert: #4caf50; }
         body { font-family: 'Comic Sans MS', cursive, sans-serif; background: #fffafa; text-align: center; margin: 0; padding: 0; }
         
+        /* Écran d'accueil avec le message vidéo du Lapin */
+        #intro-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 5000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+        video { width: 90%; max-width: 600px; border-radius: 15px; border: 5px solid var(--rose); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        
         #header { background: var(--rose); color: white; padding: 15px; font-size: 1.2rem; font-weight: bold; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         
-        /* LA SOLUTION : Ce conteneur force les points à rester collés à l'image peu importe le zoom */
-        .map-wrapper { 
-            position: relative; 
-            display: inline-block; 
-            width: 100%; 
-            margin: 0 auto;
-        }
-
+        .map-wrapper { position: relative; display: inline-block; width: 100%; margin: 0 auto; }
         .map-img { width: 100%; height: auto; display: block; }
 
         .spot {
@@ -38,12 +39,21 @@
 
         #photo-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; }
         #hint-img { width: 85%; border: 8px solid white; border-radius: 20px; max-height: 60vh; object-fit: cover; }
-        .btn-confirm { margin-top: 20px; padding: 15px 40px; background: var(--vert); color: white; border-radius: 30px; font-size: 1.5rem; border: none; font-weight: bold; }
+        .btn-confirm { margin-top: 20px; padding: 15px 40px; background: var(--vert); color: white; border-radius: 30px; font-size: 1.5rem; border: none; font-weight: bold; cursor: pointer; }
 
         #victory { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
+
+<div id="intro-screen">
+    <h2 style="color: var(--rose); margin-bottom: 20px; padding: 0 10px;">Un message pour Lanha...</h2>
+    <video id="video-lapin" controls>
+        <source src="lapin.mp4" type="video/mp4">
+        Ton navigateur ne supporte pas la vidéo.
+    </video>
+    <button class="btn-confirm" onclick="startHunt()" style="margin-top: 30px;">Voir la carte ! 🗺️</button>
+</div>
 
 <div id="header">🏠 Appuie sur l'Étoile !</div>
 
@@ -65,7 +75,7 @@
 </div>
 
 <div id="victory">
-    <h1 style="color: var(--rose); font-size: 3rem;">BRAVO ! 🎉</h1>
+    <h1 style="color: var(--rose); font-size: 3rem;">BRAVO LANHA ! 🎉</h1>
     <div style="font-size: 100px;">🐰🍫🐣</div>
     <button onclick="location.reload()" class="btn-confirm">Recommencer</button>
 </div>
@@ -73,6 +83,11 @@
 <script>
     let currentActiveStep = 0;
     let nextMsgTemp = "";
+
+    function startHunt() {
+        document.getElementById('intro-screen').style.display = 'none';
+        document.getElementById('video-lapin').pause();
+    }
 
     function openPhoto(num, nextMsg) {
         document.getElementById('hint-img').src = 'photo' + num + '.jpg';
